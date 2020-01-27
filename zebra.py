@@ -24,35 +24,32 @@ _, contours, hierarchy = cv2.findContours(
     mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
 new_contours = []
+final_contours = []
+centroid_y = 0
 
 for cnt in contours:
     area = cv2.contourArea(cnt)
     if area > 500:
         approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
         if len(approx) < 7:
-            # rect = cv2.minAreaRect(cnt)
-            # box = cv2.boxPoints(rect)
-            # box = box.astype('int')
-            # new_contours.append(box)
             new_contours.append(cnt)
-            # extLeft = cnt[cnt[:, :, 0].argmin()][0]
-            # extRight = cnt[cnt[:, :, 0].argmax()][0]
-            # extTop = cnt[cnt[:, :, 1].argmin()][0]
-            # extBot = cnt[cnt[:, :, 1].argmax()][0]
+            M = cv2.moments(cnt)
+            # cx = int(M['m10']/M['m00'])
+            cy = int(M['m01']/M['m00'])
+            centroid_y = centroid_y + cy
 
-            # print(extTop, end=' ')
-            # print(extRight, end=' ')
-            # print(extBot, end=' ')
-            # print(extLeft, end=' ')
-
-            # new_contours.append(
-            #     np.array([[extTop, extRight, extBot, extLeft]]))
-            # print()
+centroid_y = centroid_y/len(new_contours)
 
 
-cv2.drawContours(image, new_contours, -1, (0, 255, 0), 2)
+for cnt in new_contours:
+    M = cv2.moments(cnt)
+    cy = int(M['m01']/M['m00'])
+    if abs(cy - centroid_y) < 50:
+        final_contours.append(cnt)
 
-cv2.imwrite('output/new_zebra5.jpeg', image)
+
+cv2.drawContours(image, final_contours, -1, (0, 255, 0), 2)
+
 cv2.imshow('zebra', mask)
 cv2.imshow('original', image)
 
