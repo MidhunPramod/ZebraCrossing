@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-image = cv2.imread('input/zebra5.jpeg')
+image = cv2.imread('input/zebra.jpeg')
 hsvimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 kernel = np.ones((3, 3), np.uint8)
 
@@ -52,6 +52,7 @@ cv2.drawContours(image, final_contours, -1, (0, 255, 0), 2)
 
 cv2.imshow('zebra', mask)
 cv2.imshow('original', image)
+cv2.imwrite('output/new_zebra.jpeg', image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
